@@ -16,3 +16,5 @@ make :; forge script script/MakeMerkle.s.sol:MakeMerkle
 # Generate input and output files 
 
 merkle :; forge script script/GenerateInput.s.sol:GenerateInput && forge script script/MakeMerkle.s.sol:MakeMerkle
+
+zktest :; foundryup-zksync && forge test --zksync && foundryup

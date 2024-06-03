@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import { MerkleAirdrop } from "../src/MerkleAirdrop.sol";
-import { AirdropToken } from "./mocks/AirdropToken.sol";
+import { MerkleAirdrop } from "../../src/MerkleAirdrop.sol";
+import { BagelToken } from "../../src/BagelToken.sol";
 import { Test } from "forge-std/Test.sol";
 import { console } from "forge-std/console.sol";
+import { DeployMerkleAirdrop } from "../../script/DeployMerkleAirdrop.s.sol";
+import { Base_Test } from "../Base_Test.t.sol";
 
-contract MerkleAirdropTest is Test {
+contract MerkleAirdropTest is Base_Test, Test {
     MerkleAirdrop public airdrop;
-    AirdropToken public token;
+    BagelToken public token;
     address public gasPayer;
     address public user;
     uint256 public userPrivKey;
@@ -23,13 +25,16 @@ contract MerkleAirdropTest is Test {
     bytes32[] proof = [proofOne, proofTwo];
 
     function setUp() public {
+        if (!isZkSyncChain()) {
+            DeployMerkleAirdrop deployer = new DeployMerkleAirdrop();
+            (airdrop, token) = deployer.deployMerkleAirdrop();
+        } else {
+            token = new BagelToken();
+            airdrop = new MerkleAirdrop(merkleRoot, token);
+            token.transfer(address(airdrop), amountToSend);
+        }
         gasPayer = makeAddr("gasPayer");
         (user, userPrivKey) = makeAddrAndKey("user");
-
-        token = new AirdropToken();
-        airdrop = new MerkleAirdrop(merkleRoot, token);
-        token.mint(address(this), amountToSend);
-        token.transfer(address(airdrop), amountToSend);
     }
 
     function signMessage(uint256 privKey) public view returns (uint8 v, bytes32 r, bytes32 s) {
