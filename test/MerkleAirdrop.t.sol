@@ -13,7 +13,7 @@ contract MerkleAirdropTest is Test {
     address public user;
     uint256 public userPrivKey;
 
-    bytes32 public merkleRoot = 0xcbe9ca252293f2987f7a0ec1cb4f5312583a07d69ab0f5d2d8c28092c084c326;
+    bytes32 public merkleRoot = 0x99df63596361a38cff50fa0d2cf8c3550da341ad5ebb1a6d9733fefb56c3b4a4;
     uint256 amountToCollect = (25 * 1e6); // 25.000000
     uint256 amountToSend = amountToCollect * 4;
 
@@ -31,23 +31,24 @@ contract MerkleAirdropTest is Test {
         token.transfer(address(airdrop), amountToSend);
     }
 
-    function signMessage(address signer, uint256 privKey) public returns (uint8 v, bytes32 r, bytes32 s) {
-        vm.startPrank(signer);
-        bytes32 hash = keccak256("AirdropClaim(address account,uint256 amount)");
-        (v, r, s) = vm.sign(privKey, hash);
-        vm.stopPrank();
+    function signMessage(uint256 privKey) public pure returns (uint8 v, bytes32 r, bytes32 s) {
+        bytes32 hashedMessage = keccak256(abi.encode("AirdropClaim(address account,uint256 amount)"));
+        (v, r, s) = vm.sign(privKey, hashedMessage);
     }
 
     function testUsersCanClaim() public {
         uint256 startingBalance = token.balanceOf(gasPayer);
 
         // get the signature
-        (uint8 v, bytes32 r, bytes32 s) = signMessage(user, userPrivKey);
+        vm.startPrank(user);
+        (uint8 v, bytes32 r, bytes32 s) = signMessage(userPrivKey);
+        vm.stopPrank();
 
         // gasPayer claims the airdrop for the user
         vm.prank(gasPayer);
         airdrop.claim(user, amountToCollect, proof, v, r, s);
-        uint256 endingBalance = token.balanceOf(gasPayer);
+        uint256 endingBalance = token.balanceOf(user);
+        console.log("Ending balance: %d", endingBalance);
         assertEq(endingBalance - startingBalance, amountToCollect);
     }
 }

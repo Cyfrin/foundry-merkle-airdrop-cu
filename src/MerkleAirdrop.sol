@@ -22,6 +22,8 @@ contract MerkleAirdrop is EIP712{
     bytes32 private immutable i_merkleRoot;
     mapping(address user => bool claimed) private s_hasClaimed;
 
+    string private constant MESSAGE = "AirdropClaim(address account,uint256 amount)";
+
     event Claimed(address account, uint256 amount);
     event MerkleRootUpdated(bytes32 newMerkleRoot);
 
@@ -40,7 +42,7 @@ contract MerkleAirdrop is EIP712{
         }
 
         // Verify the signature
-        if (!_isValidSignature(account, _messageHash(account, amount), v, r, s)) {
+        if (!_isValidSignature(account, MESSAGE, v, r, s)) {
             revert MerkleAirdrop__InvalidSignature();
         }
 
@@ -58,6 +60,17 @@ contract MerkleAirdrop is EIP712{
         i_airdropToken.safeTransfer(account, amount);
     }
 
+    // message we expect to have been signed
+    // function getMessageHash(address account, uint256 amount)
+    // public view returns (bytes32)
+    // {
+    //     return _hashTypedDataV4(keccak256(abi.encode(
+    //         keccak256("AirdropClaim(address account,uint256 amount)"),
+    //         account,
+    //         amount
+    //     )));
+    // }
+
     /*//////////////////////////////////////////////////////////////
                              VIEW AND PURE
     //////////////////////////////////////////////////////////////*/
@@ -74,26 +87,16 @@ contract MerkleAirdrop is EIP712{
                              INTERNAL
     //////////////////////////////////////////////////////////////*/
 
-    function _getSigner(bytes32 digest, uint8 _v, bytes32 _r, bytes32 _s) internal pure returns (address) {
+    function _getSigner(string memory message, uint8 _v, bytes32 _r, bytes32 _s) internal pure returns (address) {
+        bytes32 hashedMessage = keccak256(abi.encode(message));
         (address signer, /*ECDSA.RecoverError recoverError*/, /*bytes32 signatureLength*/ ) =
-            ECDSA.tryRecover(digest, _v, _r, _s);
+            ECDSA.tryRecover(hashedMessage, _v, _r, _s);
         return signer;
-    }
-
-    // message we expect to have been signed
-    function _messageHash(address account, uint256 amount)
-    internal view returns (bytes32)
-    {
-        return _hashTypedDataV4(keccak256(abi.encode(
-            keccak256("AirdropClaim(address account,uint256 amount)"),
-            account,
-            amount
-        )));
     }
 
     function _isValidSignature(
         address signer, 
-        bytes32 digest, 
+        string memory message, 
         uint8 _v,
         bytes32 _r,
         bytes32 _s
@@ -101,29 +104,21 @@ contract MerkleAirdrop is EIP712{
     internal pure returns (bool)
     {
         // _getSigner is a function that returns the expected/calculated signer of the message whereas signature is the actual signer
-        address actualSigner = _getSigner(digest, _v, _r, _s);
-        return (actualSigner == signer);
+        address actualSigner = _getSigner(message, _v, _r, _s);
+        bool isTue = (actualSigner == signer);
+        return (isTue);
     }
 
     // function _isValidSignature(
-    //     uint256 message,
+    //     address signer, 
+    //     bytes32 digest, 
     //     uint8 _v,
     //     bytes32 _r,
-    //     bytes32 _s,
-    //     address signer // the account that is allowed in the merkle tree
-    // )
-    //     public
-    //     pure
-    //     returns (bool)
-    // {
-    //     // You can also use isValidSignatureNow
-    //     address actualSigner = _getSigner(message, _v, _r, _s);
-    //     return (actualSigner == signer); // verify the signer of the message is the account we wish to airdrop tokens to from the merkle tree
-    // }
-
-    // function _isValidSignature(address account, bytes32 hash, bytes memory signature) internal pure returns (bool) {
-    //     bytes32 signedHash = MessageHashUtils.toEthSignedMessageHash(hash); //  NOTE: shouldnt i be using this????
-    //     return signedHash.recover(signature) == account;
+    //     bytes32 _s
+    // ) 
+    // internal view returns (bool) {
+    //     bytes memory signature = abi.encode(_v, _r, _s);
+    //     return SignatureChecker.isValidSignatureNow(signer, digest, signature);
     // }
 
     
