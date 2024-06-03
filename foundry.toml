@@ -2,5 +2,9 @@
 src = "src"
 out = "out"
 libs = ["lib"]
+ffi = true
+solc = "0.8.24"
+fs_permissions = [{ access = "read-write", path = "./"}]
+remappings = ['murky/=lib/murky/']
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
