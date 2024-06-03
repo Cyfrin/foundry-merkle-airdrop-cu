@@ -1,0 +1,18 @@
+-include .env
+
+.PHONY: all test clean deploy fund help install snapshot format anvil 
+
+all: clean remove install update build test
+
+# Clean the repo
+clean  :; forge clean
+
+# Generate Merkle Tree input file
+generate :; forge script script/GenerateInput.s.sol:GenerateInput && 
+
+# Make Merkle Root and Proofs
+make :; forge script script/MakeMerkle.s.sol:MakeMerkle
+
+# Generate input and output files 
+
+merkle :; forge script script/GenerateInput.s.sol:GenerateInput && forge script script/MakeMerkle.s.sol:MakeMerkle
