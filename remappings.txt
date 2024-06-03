@@ -1,2 +1,3 @@
 forge-std/=lib/forge-std/src/
 murky/=lib/murky/
+@openzeppelin/=lib/openzeppelin-contracts/

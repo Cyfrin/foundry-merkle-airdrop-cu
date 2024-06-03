@@ -4,54 +4,50 @@ pragma solidity ^0.8.24;
 import { MerkleAirdrop } from "../src/MerkleAirdrop.sol";
 import { AirdropToken } from "./mocks/AirdropToken.sol";
 import { Test } from "forge-std/Test.sol";
+import { console } from "forge-std/console.sol";
 
 contract MerkleAirdropTest is Test {
     MerkleAirdrop public airdrop;
     AirdropToken public token;
-    bytes32 public merkleRoot = 0x3b2e22da63ae414086bec9c9da6b685f790c6fab200c7918f2879f08793d77bd;
+    address public gasPayer;
+    address public user;
+    uint256 public userPrivKey;
+
+    bytes32 public merkleRoot = 0xcbe9ca252293f2987f7a0ec1cb4f5312583a07d69ab0f5d2d8c28092c084c326;
     uint256 amountToCollect = (25 * 1e6); // 25.000000
     uint256 amountToSend = amountToCollect * 4;
-    address collectorOne = 0x20F41376c713072937eb02Be70ee1eD0D639966C;
 
-    bytes32 proofOne = 0x32cee63464b09930b5c3f59f955c86694a4c640a03aa57e6f743d8a3ca5c8838;
-    bytes32 proofTwo = 0x8ff683185668cbe035a18fccec4080d7a0331bb1bbc532324f40501de5e8ea5c;
+    bytes32 proofOne = 0x1e6784ff835523401f4db6e3ab48fa5bdf523a46a5bc0410a5639d837352b194;
+    bytes32 proofTwo = 0x6d03f01cc9fb12c48e1c8d9f3f9425f48f664fa9cf3520a6d0c993d01ed00e45;
     bytes32[] proof = [proofOne, proofTwo];
 
     function setUp() public {
+        gasPayer = makeAddr("gasPayer");
+        (user, userPrivKey) = makeAddrAndKey("user");
+
         token = new AirdropToken();
         airdrop = new MerkleAirdrop(merkleRoot, token);
         token.mint(address(this), amountToSend);
         token.transfer(address(airdrop), amountToSend);
     }
 
-    function signMessage(signer, privKey) public returns (bytes memory signature) {
+    function signMessage(address signer, uint256 privKey) public returns (uint8 v, bytes32 r, bytes32 s) {
         vm.startPrank(signer);
         bytes32 hash = keccak256("AirdropClaim(address account,uint256 amount)");
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(privKey, hash);
-        address signer = ecrecover(hash, v, r, s);
-        signature = abi.encodePacked(r, s, v);
-        vm.stopPrank(signer);
+        (v, r, s) = vm.sign(privKey, hash);
+        vm.stopPrank();
     }
 
     function testUsersCanClaim() public {
-        uint256 startingBalance = token.balanceOf(collectorOne);
+        uint256 startingBalance = token.balanceOf(gasPayer);
 
-        (address alice, uint256 alicePk) = makeAddrAndKey("alice");
-        emit log_address(alice);
-        signMessage(alice, alicePk);
+        // get the signature
+        (uint8 v, bytes32 r, bytes32 s) = signMessage(user, userPrivKey);
 
-        airdrop.claim(collectorOne, amountToCollect, proof);
-        uint256 endingBalance = token.balanceOf(collectorOne);
+        // gasPayer claims the airdrop for the user
+        vm.prank(gasPayer);
+        airdrop.claim(user, amountToCollect, proof, v, r, s);
+        uint256 endingBalance = token.balanceOf(gasPayer);
         assertEq(endingBalance - startingBalance, amountToCollect);
     }
-    // function testUsersCanClaim() public {
-    //     uint256 startingBalance = token.balanceOf(collectorOne);
-
-    //     vm.startPrank(collectorOne);
-    //     airdrop.claim(collectorOne, amountToCollect, proof);
-    //     vm.stopPrank();
-
-    //     uint256 endingBalance = token.balanceOf(collectorOne);
-    //     assertEq(endingBalance - startingBalance, amountToCollect);
-    // }
 }

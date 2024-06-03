@@ -15,7 +15,7 @@ import {ScriptHelper} from "murky/script/common/ScriptHelper.sol";
 
 /// @notice Merkle proof generator script
 /// @author kootsZhin
-contract MerkleScript is Script, ScriptHelper {
+contract MakeMerkle is Script, ScriptHelper {
     using stdJson for string; // enables us to use the json cheatcodes for strings
 
     Merkle private m = new Merkle(); // instance of the merkle contract from Murky to do shit 
