@@ -16,6 +16,7 @@ contract MerkleAirdropTest is Test {
     bytes32 public merkleRoot = 0x99df63596361a38cff50fa0d2cf8c3550da341ad5ebb1a6d9733fefb56c3b4a4;
     uint256 amountToCollect = (25 * 1e6); // 25.000000
     uint256 amountToSend = amountToCollect * 4;
+    string constant MESSAGE = "AirdropClaim(address account,uint256 amount)";
 
     bytes32 proofOne = 0x1e6784ff835523401f4db6e3ab48fa5bdf523a46a5bc0410a5639d837352b194;
     bytes32 proofTwo = 0x6d03f01cc9fb12c48e1c8d9f3f9425f48f664fa9cf3520a6d0c993d01ed00e45;
@@ -31,8 +32,8 @@ contract MerkleAirdropTest is Test {
         token.transfer(address(airdrop), amountToSend);
     }
 
-    function signMessage(uint256 privKey) public pure returns (uint8 v, bytes32 r, bytes32 s) {
-        bytes32 hashedMessage = keccak256(abi.encode("AirdropClaim(address account,uint256 amount)"));
+    function signMessage(uint256 privKey) public view returns (uint8 v, bytes32 r, bytes32 s) {
+        bytes32 hashedMessage = keccak256(abi.encode(MESSAGE, user, amountToCollect));
         (v, r, s) = vm.sign(privKey, hashedMessage);
     }
 

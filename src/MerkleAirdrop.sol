@@ -42,7 +42,7 @@ contract MerkleAirdrop is EIP712{
         }
 
         // Verify the signature
-        if (!_isValidSignature(account, MESSAGE, v, r, s)) {
+        if (!_isValidSignature(account, abi.encode(MESSAGE, account, amount), v, r, s)) {
             revert MerkleAirdrop__InvalidSignature();
         }
 
@@ -87,8 +87,8 @@ contract MerkleAirdrop is EIP712{
                              INTERNAL
     //////////////////////////////////////////////////////////////*/
 
-    function _getSigner(string memory message, uint8 _v, bytes32 _r, bytes32 _s) internal pure returns (address) {
-        bytes32 hashedMessage = keccak256(abi.encode(message));
+    function _getSigner(bytes memory message, uint8 _v, bytes32 _r, bytes32 _s) internal pure returns (address) {
+        bytes32 hashedMessage = keccak256(message);
         (address signer, /*ECDSA.RecoverError recoverError*/, /*bytes32 signatureLength*/ ) =
             ECDSA.tryRecover(hashedMessage, _v, _r, _s);
         return signer;
@@ -96,7 +96,7 @@ contract MerkleAirdrop is EIP712{
 
     function _isValidSignature(
         address signer, 
-        string memory message, 
+        bytes memory message, 
         uint8 _v,
         bytes32 _r,
         bytes32 _s
