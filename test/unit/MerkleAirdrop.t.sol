@@ -29,7 +29,6 @@ contract MerkleAirdropTest is Base_Test, Test {
             DeployMerkleAirdrop deployer = new DeployMerkleAirdrop();
             (airdrop, token) = deployer.deployMerkleAirdrop();
         } else {
-            console.log("got here");
             token = new BagelToken();
             airdrop = new MerkleAirdrop(merkleRoot, token);
             token.mint(token.owner(), amountToSend);
@@ -50,6 +49,9 @@ contract MerkleAirdropTest is Base_Test, Test {
         // get the signature
         vm.startPrank(user);
         (uint8 v, bytes32 r, bytes32 s) = signMessage(userPrivKey, user);
+        console.log("V:", v);
+        console.logBytes32(r);
+        console.logBytes32(s);
         vm.stopPrank();
 
         // gasPayer claims the airdrop for the user
