@@ -7,7 +7,8 @@ solc = "0.8.24"
 fs_permissions = [{ access = "read-write", path = "./"}]
 remappings = [
     'murky/=lib/murky/',
-    '@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/'
+    '@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/',
+    'foundry-devops/=lib/foundry-devops'
 
 ]
 
