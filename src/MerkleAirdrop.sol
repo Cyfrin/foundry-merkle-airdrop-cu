@@ -19,7 +19,6 @@ contract MerkleAirdrop is EIP712 {
     using ECDSA for bytes32;
     using SafeERC20 for IERC20; // Prevent sending tokens to recipients who can’t receive
 
-    error MerkleAirdrop__InvalidFeeAmount();
     error MerkleAirdrop__InvalidProof();
     error MerkleAirdrop__TransferFailed();
     error MerkleAirdrop__AlreadyClaimed();
@@ -113,7 +112,6 @@ contract MerkleAirdrop is EIP712 {
     /*//////////////////////////////////////////////////////////////
                              VIEW AND PURE
     //////////////////////////////////////////////////////////////*/
-    //why do I need this getter? -> cos it's a private variable
     function getMerkleRoot() external view returns (bytes32) {
         return i_merkleRoot;
     }
@@ -136,8 +134,9 @@ contract MerkleAirdrop is EIP712 {
     ) internal pure returns (bool) {
         // could also use SignatureChecker.isValidSignatureNow(signer, digest, signature)
         (
-            address actualSigner /*ECDSA.RecoverError recoverError*/ /*bytes32 signatureLength*/,
-            ,
+            address actualSigner, 
+            /*ECDSA.RecoverError recoverError*/, 
+            /*bytes32 signatureLength*/
 
         ) = ECDSA.tryRecover(digest, _v, _r, _s);
         return (actualSigner == signer);

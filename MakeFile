@@ -68,9 +68,3 @@ make :; forge script script/MakeMerkle.s.sol:MakeMerkle
 merkle :; forge script script/GenerateInput.s.sol:GenerateInput && forge script script/MakeMerkle.s.sol:MakeMerkle
 
 zktest :; foundryup-zksync && forge test --zksync && foundryup
-
-CONTRACT_ADDRESS := 0x26b368C3Ed16313eBd6660b72d8e4439a697Cb0B
-
-zk-interact :; cast send ${CONTRACT_ADDRESS} --rpc-url http://127.0.0.1:8011 "claim(address,uint256,bytes32[],uint8,bytes32,bytes32)" "0x6CA6d1e2D5347Bfab1d91e883F1915560e09129D" 25000000 "[0x1e6784ff835523401f4db6e3ab48fa5bdf523a46a5bc0410a5639d837352b194,0x6d03f01cc9fb12c48e1c8d9f3f9425f48f664fa9cf3520a6d0c993d01ed00e45]" 27 "0x2ad4dcfe459e8e1a797969763c670411b8e1f89387e131fb5e4c2fb1d6e816b7" "0x2166e1729e8c2cd4f71f2f74058b9f933573690431dced7d049ae0529990cb47" --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --legacy
-
-fund :; cast send 0x4B5DF730c2e6b28E17013A1485E5d9BC41Efe021 "mint(address,uint256)" 0x36615Cf349d7F6344891B1e7CA7C72883F5dc049 --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --rpc-url http://

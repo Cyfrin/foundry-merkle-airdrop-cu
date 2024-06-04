@@ -23,7 +23,7 @@ contract MerkleAirdropTest is Base_Test, Test {
     bytes32 proofOne = 0xe48eabad7bcfec7251063d2cc38d66b3a0819db5e6a7b1afe47da4a2e412e945;
     bytes32 proofTwo = 0x46f4c7c1c21e8a90c03949beda51d2d02d1ec75b55dd97a999d3edbafa5a1e2f;
     bytes32[] proof = [proofOne, proofTwo];
-
+    
     function setUp() public {
         if (!isZkSyncChain()) {
             DeployMerkleAirdrop deployer = new DeployMerkleAirdrop();
@@ -36,6 +36,7 @@ contract MerkleAirdropTest is Base_Test, Test {
         }
         gasPayer = makeAddr("gasPayer");
         (user, userPrivKey) = makeAddrAndKey("user");
+        console.log(user);
     }
 
     function signMessage(uint256 privKey, address account) public view returns (uint8 v, bytes32 r, bytes32 s) {
@@ -54,6 +55,9 @@ contract MerkleAirdropTest is Base_Test, Test {
         // gasPayer claims the airdrop for the user
         vm.prank(gasPayer);
         airdrop.claim(user, amountToCollect, proof, v, r, s);
+        console.log("sig", v);
+        console.logBytes32(r);
+        console.logBytes32(s);
         uint256 endingBalance = token.balanceOf(user);
         console.log("Ending balance: %d", endingBalance);
         assertEq(endingBalance - startingBalance, amountToCollect);
