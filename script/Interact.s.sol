@@ -15,9 +15,10 @@ contract ClaimAirdrop is Script {
     bytes32[] proof = [proofOne, proofTwo];
 
     // These are from the default anvil key! Do not use in production
-    uint8 v = 27;
-    bytes32 r = 0x78e335ba481e295fbb43d1981f3dfdb55c71ba21f55a3726b7c7dceb29920a41;
-    bytes32 s = 0x59454dc6a6440a2c59a5f019d69c5ccfec43165aa1209ae7fa3a933f305599cf;
+    // These will change every time the Merkle Airdrop contract is deployed
+    uint8 v = 28;
+    bytes32 r = 0x03bec7e625d69a6bdbfab32d4cfd0f6e0db7623d86af9158ff8fb0f198eb65bd;
+    bytes32 s = 0x1edfcf0d87478dd13af06b0de252eabf0c589b28f050f1447f12e5adcdf4697c;
 
     function claimAirdrop(address mostRecentlyDeployed) public {
         vm.startBroadcast();
@@ -42,7 +43,6 @@ contract SignMessage is Script {
     function signMessage(address mostRecentlyDeployed) public returns (uint8 v, bytes32 r, bytes32 s) {
         vm.startBroadcast();
         bytes32 digest = MerkleAirdrop(mostRecentlyDeployed).getMessageHash(CLAIMING_ADDRESS, amountToCollect);
-        console.log("Signing");
         (v, r, s) = vm.sign(ANVIL_PRIV_KEY, digest);
         vm.stopBroadcast();
         console.log("v");

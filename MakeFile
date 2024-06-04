@@ -2,7 +2,11 @@
 
 .PHONY: all test clean deploy fund help install snapshot format anvil 
 
-DEFAULT_ANVIL_KEY := 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+DEFAULT_ANVIL_KEY := 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+DEFAULT_ANVIL_KEY_2 := 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+DEFAULT_ANVIL_ADDRESS := 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+DEFAULT_ANVIL_ADDRESS_2 := 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+DEFAULT_ZKSYNC_ADDRESS := 0x36615Cf349d7F6344891B1e7CA7C72883F5dc049
 DEFAULT_ZKSYNC_LOCAL_KEY := 0x7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110
 
 help:
@@ -47,7 +51,7 @@ endif
 deploy:
 	@forge script script/DeployMerkleAirdrop.s.sol:DeployMerkleAirdrop $(NETWORK_ARGS)
 
-ROOT := 0xe947b549e1f14cbad0ae5bf939b5cc4417e60cb6404c3497d970b5e2132e3562
+ROOT := 0x474d994c58e37b12085fdb7bc6bbcd046cf1907b90de3b7fb083cf3636c8ebfb
 # As of writing, the Alchemy zkSync RPC URL is not working correctly 
 deploy-zk:
 	forge create src/MerkleAirdrop.sol:MerkleAirdrop --rpc-url http://127.0.0.1:8011 --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --constructor-args ${ROOT} $(shell forge create src/BagelToken.sol:BagelToken --rpc-url http://127.0.0.1:8011 --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --legacy --zksync | grep "Deployed to:" | awk '{print $$3}') --legacy --zksync
@@ -69,10 +73,19 @@ merkle :; forge script script/GenerateInput.s.sol:GenerateInput && forge script 
 
 zktest :; foundryup-zksync && forge test --zksync && foundryup
 
-CONTRACT_ADDRESS := 
+sign:;
+	@forge script script/Interact.s.sol:SignMessage --sender ${DEFAULT_ANVIL_ADDRESS} --rpc-url http://localhost:8545 --private-key $(DEFAULT_ANVIL_KEY) --broadcast
 
-# zk-claim :; cast send ${CONTRACT_ADDRESS} "claim(address,uint256,bytes32[],uint8,bytes32,bytes32)" 0x6CA6d1e2D5347Bfab1d91e883F1915560e09129D 25000000000000000000 "["0x0fd7c981d39bece61f7499702bf59b3114a90e66b51ba2c53abdf7b62986c00a","0x46f4c7c1c21e8a90c03949beda51d2d02d1ec75b55dd97a999d3edbafa5a1e2f"]" 27 "0x6ef35186d5e0e854196ab143613e564caa45707c3c02c97f9583dc2525dea233" "0x2a1438d27acf1ae24e1bf18b44fd7c0f72025a3cf1cc7a44f1992bf615cd887c" --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --rpc-url http://127.0.0.1:8011
+claim:;
+	@forge script script/Interact.s.sol:ClaimAirdrop --sender ${DEFAULT_ANVIL_ADDRESS_2} --rpc-url http://localhost:8545 --private-key $(DEFAULT_ANVIL_KEY_2) --broadcast
 
-# fund :; cast send 0x094499Df5ee555fFc33aF07862e43c90E6FEe501 "mint(address,uint256)" 0x36615Cf349d7F6344891B1e7CA7C72883F5dc049 100000000000000000000 --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --rpc-url http://127.0.0.1:8011
+# Add below to a Bash script
 
-# transfer :; cast send 0x094499Df5ee555fFc33aF07862e43c90E6FEe501 "transfer(address,uint256)" 0xb76eD02Dea1ba444609602BE5D587c4bFfd67153 100000000000000000000 --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --rpc-url http://127.0.0.1:8011
+# AIRDROP_ADDRESS := 0x65C899B5fb8Eb9ae4da51D67E1fc417c7CB7e964
+# TOKEN_ADDRESS := 0x60Aa68f9D0D736B9a0a716d04323Ba3b22602840
+
+# zk-claim :; cast send ${AIRDROP_ADDRESS} "claim(address,uint256,bytes32[],uint8,bytes32,bytes32)" ${DEFAULT_ANVIL_ADDRESS} 25000000000000000000 "[0xd1445c931158119b00449ffcac3c947d028c0c359c34a6646d95962b3b55c6ad,0x46f4c7c1c21e8a90c03949beda51d2d02d1ec75b55dd97a999d3edbafa5a1e2f]" 27 0x9558937d20fb3cdaead5e0a2c04292287d46e2363170d1ef5c21e36ddde4ce92 0x3730950052e181e017e6dfe70a6a21e576e29898a45f0e38ce4c628251a742ca --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --rpc-url http://127.0.0.1:8011
+
+# fund :; cast send ${TOKEN_ADDRESS} "mint(address,uint256)" ${DEFAULT_ZKSYNC_ADDRESS} 100000000000000000000 --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --rpc-url http://127.0.0.1:8011
+
+# transfer :; cast send ${TOKEN_ADDRESS} "transfer(address,uint256)" ${AIRDROP_ADDRESS} 100000000000000000000 --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --rpc-url http://127.0.0.1:8011
