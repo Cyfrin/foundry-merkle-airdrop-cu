@@ -4,6 +4,7 @@
 
 DEFAULT_ANVIL_KEY := 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 DEFAULT_ZKSYNC_LOCAL_KEY := 0x7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110
+ROOT := 0x99df63596361a38cff50fa0d2cf8c3550da341ad5ebb1a6d9733fefb56c3b4a4
 
 help:
 	@echo "Usage:"
@@ -45,17 +46,17 @@ ifeq ($(findstring --network sepolia,$(ARGS)),--network sepolia)
 endif
 
 deploy:
-	@forge script script/DeployFundMe.s.sol:DeployFundMe $(NETWORK_ARGS)
+	@forge script script/DeployMerkleAidrop.s.sol:DeployMerkleAirdrop $(NETWORK_ARGS)
 
 # As of writing, the Alchemy zkSync RPC URL is not working correctly 
 deploy-zk:
-	forge create src/FundMe.sol:FundMe --rpc-url http://127.0.0.1:8011 --account defaultKey --constructor-args $(shell forge create test/mock/MockV3Aggregator.sol:MockV3Aggregator --rpc-url http://127.0.0.1:8011 --private-key $(DEFAULT_ZKSYNC_LOCAL_KEY) --constructor-args 8 200000000000 --legacy --zksync | grep "Deployed to:" | awk '{print $$3}') --legacy --zksync
+	forge create src/MerkleAirdrop.sol:MerkleAirdrop --constructor-args ${ROOT} (forge create src/BagelToken.sol:BagelToken --rpc-url http://127.0.0.1:8011 --account defaultKey --legacy --zksync) --rpc-url http://127.0.0.1:8011 --account defaultKey --legacy --zksync
 
 deploy-zk-sepolia:
-	forge create src/FundMe.sol:FundMe --rpc-url ${ZKSYNC_SEPOLIA_RPC_URL} --account defaultKey --constructor-args 0xfEefF7c3fB57d18C5C6Cdd71e45D2D0b4F9377bF --legacy --zksync
+	forge create src/MerkleAirdrop.sol:MerkleAirdrop --constructor-args ${ROOT} (forge create src/BagelToken.sol:BagelToken --rpc-url ${ZKSYNC_SEPOLIA_RPC_URL} --account defaultKey --legacy --zksync) --rpc-url ${ZKSYNC_SEPOLIA_RPC_URL} --account defaultKey --legacy --zksync
 
 # Generate Merkle Tree input file
-generate :; forge script script/GenerateInput.s.sol:GenerateInput && 
+generate :; forge script script/GenerateInput.s.sol:GenerateInput
 
 # Make Merkle Root and Proofs
 make :; forge script script/MakeMerkle.s.sol:MakeMerkle
