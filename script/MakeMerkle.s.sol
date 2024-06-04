@@ -13,8 +13,16 @@ import {ScriptHelper} from "murky/script/common/ScriptHelper.sol";
 // 2. Run `forge script script/Merkle.s.sol`
 // 3. The output file will be generated in /script/target/output.json
 
-/// @notice Merkle proof generator script
-/// @author kootsZhin
+/** 
+ * @title MakeMerkle
+ * @author Ciara Nightingale
+ * @author Cyfrin
+ *
+ * Original Work by:
+ * @author kootsZhin
+ * @notice https://github.com/dmfxyz/murky
+ */
+
 contract MakeMerkle is Script, ScriptHelper {
     using stdJson for string; // enables us to use the json cheatcodes for strings
 

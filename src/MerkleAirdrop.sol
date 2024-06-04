@@ -10,7 +10,7 @@ import { MessageHashUtils } from "@openzeppelin/contracts/utils/cryptography/Mes
 
 contract MerkleAirdrop is EIP712{
     using ECDSA for bytes32;
-    using SafeERC20 for IERC20; // why? prevent sending tokens to recipients who can’t receive
+    using SafeERC20 for IERC20; // Prevent sending tokens to recipients who can’t receive
 
     error MerkleAirdrop__InvalidFeeAmount();
     error MerkleAirdrop__InvalidProof();
@@ -87,12 +87,7 @@ contract MerkleAirdrop is EIP712{
                              INTERNAL
     //////////////////////////////////////////////////////////////*/
 
-    function _getSigner(bytes32 digest, uint8 _v, bytes32 _r, bytes32 _s) internal pure returns (address) {
-        (address signer, /*ECDSA.RecoverError recoverError*/, /*bytes32 signatureLength*/ ) =
-            ECDSA.tryRecover(digest, _v, _r, _s);
-        return signer;
-    }
-
+    // verify whether the recovered signer is the expected signer/the account to airdrop tokens for 
     function _isValidSignature(
         address signer, 
         bytes32 digest, 
@@ -102,8 +97,9 @@ contract MerkleAirdrop is EIP712{
     )
     internal pure returns (bool)
     {
-        // _getSigner is a function that returns the expected/calculated signer of the message whereas signature is the actual signer
-        address actualSigner = _getSigner(digest, _v, _r, _s);
+        // could also use SignatureChecker.isValidSignatureNow(signer, digest, signature)
+        (address actualSigner, /*ECDSA.RecoverError recoverError*/, /*bytes32 signatureLength*/ ) =
+            ECDSA.tryRecover(digest, _v, _r, _s);
         return (actualSigner == signer);
     }
 

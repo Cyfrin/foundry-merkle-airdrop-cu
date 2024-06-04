@@ -37,8 +37,8 @@ contract MerkleAirdropTest is Base_Test, Test {
         (user, userPrivKey) = makeAddrAndKey("user");
     }
 
-    function signMessage(uint256 privKey) public view returns (uint8 v, bytes32 r, bytes32 s) {
-        bytes32 hashedMessage = keccak256(abi.encode(MESSAGE, user, amountToCollect));
+    function signMessage(uint256 privKey, address account) public view returns (uint8 v, bytes32 r, bytes32 s) {
+        bytes32 hashedMessage = airdrop.getMessageHash(account, amountToCollect);
         (v, r, s) = vm.sign(privKey, hashedMessage);
     }
 
@@ -47,7 +47,7 @@ contract MerkleAirdropTest is Base_Test, Test {
 
         // get the signature
         vm.startPrank(user);
-        (uint8 v, bytes32 r, bytes32 s) = signMessage(userPrivKey);
+        (uint8 v, bytes32 r, bytes32 s) = signMessage(userPrivKey, user);
         vm.stopPrank();
 
         // gasPayer claims the airdrop for the user
