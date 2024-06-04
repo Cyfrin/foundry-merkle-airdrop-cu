@@ -35,8 +35,8 @@ This is a section of the Cyfrin Advanced Foundry Course.
 ## Quickstart
 
 ```
-git clone https://github.com/Cyfrin/foundry-fund-me-f23
-cd foundry-fund-me-f23
+git clone https://github.com/Cyfrin/merkle-airdrop-f23
+cd merkle-airdrop-f23
 forge build
 ```
 
@@ -142,8 +142,6 @@ In memory node started v0.1.0-alpha.22:
 make deploy-zk
 ```
 
-This will deploy a mock price feed and a fund me contract to the zkSync node.
-
 # Deployment to a testnet or mainnet
 
 1. Setup environment variables
@@ -164,28 +162,6 @@ Head over to [faucets.chain.link](https://faucets.chain.link/) and get some test
 
 ```
 forge script script/DeployFundMe.s.sol --rpc-url $SEPOLIA_RPC_URL --private-key $PRIVATE_KEY --broadcast --verify --etherscan-api-key $ETHERSCAN_API_KEY
-```
-
-## Scripts
-
-After deploying to a testnet or local net, you can run the scripts. 
-
-Using cast deployed locally example: 
-
-```
-cast send <FUNDME_CONTRACT_ADDRESS> "fund()" --value 0.1ether --private-key <PRIVATE_KEY>
-```
-
-or
-```
-forge script script/Interactions.s.sol:FundFundMe --rpc-url sepolia  --private-key $PRIVATE_KEY  --broadcast
-forge script script/Interactions.s.sol:WithdrawFundMe --rpc-url sepolia  --private-key $PRIVATE_KEY  --broadcast
-```
-
-### Withdraw
-
-```
-cast send <FUNDME_CONTRACT_ADDRESS> "withdraw()"  --private-key <PRIVATE_KEY>
 ```
 
 ## Estimate gas
