@@ -50,13 +50,13 @@ deploy:
 
 # As of writing, the Alchemy zkSync RPC URL is not working correctly 
 deploy-zk:
-	forge create src/MerkleAirdrop.sol:MerkleAirdrop --rpc-url http://127.0.0.1:8011 --account default --constructor-args ${ROOT} $(shell forge create src/BagelToken.sol:BagelToken --rpc-url http://127.0.0.1:8011 --account default --legacy --zksync) --legacy --zksync
+	forge create src/MerkleAirdrop.sol:MerkleAirdrop --rpc-url http://127.0.0.1:8011 --account default --constructor-args ${ROOT} $(shell forge create src/BagelToken.sol:BagelToken --rpc-url http://127.0.0.1:8011 --account default --legacy --zksync | grep "Deployed to:" | awk '{print $$3}') --legacy --zksync
 
 deploy-bagel-zk:
 	forge create src/BagelToken.sol:BagelToken --rpc-url http://127.0.0.1:8011 --account default --legacy --zksync
 
 deploy-zk-sepolia:
-	forge create src/MerkleAirdrop.sol:MerkleAirdrop --constructor-args ${ROOT} $(shell forge create src/BagelToken.sol:BagelToken --rpc-url ${ZKSYNC_SEPOLIA_RPC_URL} --account default --legacy --zksync) --rpc-url ${ZKSYNC_SEPOLIA_RPC_URL} --account default --legacy --zksync
+	forge create src/MerkleAirdrop.sol:MerkleAirdrop --rpc-url ${ZKSYNC_SEPOLIA_RPC_URL} --constructor-args ${ROOT} $(shell forge create src/BagelToken.sol:BagelToken --rpc-url ${ZKSYNC_SEPOLIA_RPC_URL} --account default --legacy --zksync | grep "Deployed to:" | awk '{print $$3}') --account default --legacy --zksync
 
 # Generate Merkle Tree input file
 generate :; forge script script/GenerateInput.s.sol:GenerateInput

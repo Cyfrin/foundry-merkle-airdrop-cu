@@ -11,7 +11,7 @@ contract DeployMerkleAirdrop is Script {
     // 4 users, 25 Bagel tokens each
     uint256 public s_amountToAirdrop = 4 * (25 * 1e6);
 
-    // Deploy the airdropper
+    // Deploy the airdrop contract and bagel token contract
     function deployMerkleAirdrop() public returns (MerkleAirdrop, BagelToken) {
         vm.startBroadcast();
         BagelToken bagelToken = new BagelToken();
