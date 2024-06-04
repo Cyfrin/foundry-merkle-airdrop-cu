@@ -15,13 +15,13 @@ contract MerkleAirdropTest is Base_Test, Test {
     address public user;
     uint256 public userPrivKey;
 
-    bytes32 public merkleRoot = 0x99df63596361a38cff50fa0d2cf8c3550da341ad5ebb1a6d9733fefb56c3b4a4;
-    uint256 amountToCollect = (25 * 1e6); // 25.000000
+    bytes32 public merkleRoot = 0xe947b549e1f14cbad0ae5bf939b5cc4417e60cb6404c3497d970b5e2132e3562;
+    uint256 amountToCollect = (25 * 1e18); // 25.000000
     uint256 amountToSend = amountToCollect * 4;
     string constant MESSAGE = "AirdropClaim(address account,uint256 amount)";
 
-    bytes32 proofOne = 0x1e6784ff835523401f4db6e3ab48fa5bdf523a46a5bc0410a5639d837352b194;
-    bytes32 proofTwo = 0x6d03f01cc9fb12c48e1c8d9f3f9425f48f664fa9cf3520a6d0c993d01ed00e45;
+    bytes32 proofOne = 0xe48eabad7bcfec7251063d2cc38d66b3a0819db5e6a7b1afe47da4a2e412e945;
+    bytes32 proofTwo = 0x46f4c7c1c21e8a90c03949beda51d2d02d1ec75b55dd97a999d3edbafa5a1e2f;
     bytes32[] proof = [proofOne, proofTwo];
 
     function setUp() public {
@@ -49,9 +49,6 @@ contract MerkleAirdropTest is Base_Test, Test {
         // get the signature
         vm.startPrank(user);
         (uint8 v, bytes32 r, bytes32 s) = signMessage(userPrivKey, user);
-        console.log("V:", v);
-        console.logBytes32(r);
-        console.logBytes32(s);
         vm.stopPrank();
 
         // gasPayer claims the airdrop for the user

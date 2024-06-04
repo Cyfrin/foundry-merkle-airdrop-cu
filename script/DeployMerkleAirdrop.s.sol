@@ -7,9 +7,9 @@ import { BagelToken } from "../src/BagelToken.sol";
 import { console } from "forge-std/console.sol";
 
 contract DeployMerkleAirdrop is Script {
-    bytes32 public s_merkleRoot = 0x99df63596361a38cff50fa0d2cf8c3550da341ad5ebb1a6d9733fefb56c3b4a4;
+    bytes32 public s_merkleRoot = 0xe947b549e1f14cbad0ae5bf939b5cc4417e60cb6404c3497d970b5e2132e3562;
     // 4 users, 25 Bagel tokens each
-    uint256 public s_amountToAirdrop = 4 * (25 * 1e6);
+    uint256 public s_amountToAirdrop = 4 * (25 * 1e18);
 
     // Deploy the airdrop contract and bagel token contract
     function deployMerkleAirdrop() public returns (MerkleAirdrop, BagelToken) {
