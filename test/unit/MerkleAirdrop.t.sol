@@ -29,8 +29,10 @@ contract MerkleAirdropTest is Base_Test, Test {
             DeployMerkleAirdrop deployer = new DeployMerkleAirdrop();
             (airdrop, token) = deployer.deployMerkleAirdrop();
         } else {
+            console.log("got here");
             token = new BagelToken();
             airdrop = new MerkleAirdrop(merkleRoot, token);
+            token.mint(token.owner(), amountToSend);
             token.transfer(address(airdrop), amountToSend);
         }
         gasPayer = makeAddr("gasPayer");
