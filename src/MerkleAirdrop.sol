@@ -22,7 +22,7 @@ contract MerkleAirdrop is EIP712{
     bytes32 private immutable i_merkleRoot;
     mapping(address user => bool claimed) private s_hasClaimed;
 
-    string private constant MESSAGE = "AirdropClaim(address account,uint256 amount)";
+    bytes32 private constant MESSAGE_TYPEHASH = keccak256("AirdropClaim(address account,uint256 amount)");
 
     event Claimed(address account, uint256 amount);
     event MerkleRootUpdated(bytes32 newMerkleRoot);
@@ -42,7 +42,7 @@ contract MerkleAirdrop is EIP712{
         }
 
         // Verify the signature
-        if (!_isValidSignature(account, abi.encode(MESSAGE, account, amount), v, r, s)) {
+        if (!_isValidSignature(account, getMessageHash(account, amount), v, r, s)) {
             revert MerkleAirdrop__InvalidSignature();
         }
 
@@ -61,15 +61,15 @@ contract MerkleAirdrop is EIP712{
     }
 
     // message we expect to have been signed
-    // function getMessageHash(address account, uint256 amount)
-    // public view returns (bytes32)
-    // {
-    //     return _hashTypedDataV4(keccak256(abi.encode(
-    //         keccak256("AirdropClaim(address account,uint256 amount)"),
-    //         account,
-    //         amount
-    //     )));
-    // }
+    function getMessageHash(address account, uint256 amount)
+    public view returns (bytes32)
+    {
+        return _hashTypedDataV4(keccak256(abi.encode(
+            MESSAGE_TYPEHASH,
+            account,
+            amount
+        )));
+    }
 
     /*//////////////////////////////////////////////////////////////
                              VIEW AND PURE
@@ -87,16 +87,15 @@ contract MerkleAirdrop is EIP712{
                              INTERNAL
     //////////////////////////////////////////////////////////////*/
 
-    function _getSigner(bytes memory message, uint8 _v, bytes32 _r, bytes32 _s) internal pure returns (address) {
-        bytes32 hashedMessage = keccak256(message);
+    function _getSigner(bytes32 digest, uint8 _v, bytes32 _r, bytes32 _s) internal pure returns (address) {
         (address signer, /*ECDSA.RecoverError recoverError*/, /*bytes32 signatureLength*/ ) =
-            ECDSA.tryRecover(hashedMessage, _v, _r, _s);
+            ECDSA.tryRecover(digest, _v, _r, _s);
         return signer;
     }
 
     function _isValidSignature(
         address signer, 
-        bytes memory message, 
+        bytes32 digest, 
         uint8 _v,
         bytes32 _r,
         bytes32 _s
@@ -104,9 +103,8 @@ contract MerkleAirdrop is EIP712{
     internal pure returns (bool)
     {
         // _getSigner is a function that returns the expected/calculated signer of the message whereas signature is the actual signer
-        address actualSigner = _getSigner(message, _v, _r, _s);
-        bool isTue = (actualSigner == signer);
-        return (isTue);
+        address actualSigner = _getSigner(digest, _v, _r, _s);
+        return (actualSigner == signer);
     }
 
     // function _isValidSignature(
@@ -120,6 +118,4 @@ contract MerkleAirdrop is EIP712{
     //     bytes memory signature = abi.encode(_v, _r, _s);
     //     return SignatureChecker.isValidSignatureNow(signer, digest, signature);
     // }
-
-    
 }
