@@ -8,6 +8,12 @@ import { SignatureChecker } from "@openzeppelin/contracts/utils/cryptography/Sig
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import { MessageHashUtils } from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
+/** 
+ * @title Merkle Airdrop - Airdrop tokens to users who can prove they are in a merkle tree
+ * @author Ciara Nightingale
+ * @author Patrick Collins
+ * @author Cyfrin
+ */
 contract MerkleAirdrop is EIP712{
     using ECDSA for bytes32;
     using SafeERC20 for IERC20; // Prevent sending tokens to recipients who can’t receive
@@ -30,7 +36,7 @@ contract MerkleAirdrop is EIP712{
     /*//////////////////////////////////////////////////////////////
                                FUNCTIONS
     //////////////////////////////////////////////////////////////*/
-    constructor(bytes32 merkleRoot, IERC20 airdropToken) EIP712("Bagel Airdrop", "1.0.0") {
+    constructor(bytes32 merkleRoot, IERC20 airdropToken) EIP712("Merkle Airdrop", "1.0.0") {
         i_merkleRoot = merkleRoot;
         i_airdropToken = airdropToken;
     }
