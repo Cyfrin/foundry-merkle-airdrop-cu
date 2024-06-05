@@ -16,9 +16,9 @@ contract ClaimAirdrop is Script {
 
     // These are from the default anvil key! Do not use in production
     // These will change every time the Merkle Airdrop contract is deployed
-    uint8 v = 28;
-    bytes32 r = 0x04209f8dfd0ef06724e83d623207ba8c33b6690e08772f8887a4eaf9a66b9182;
-    bytes32 s = 0x188938adea374fa542ad5ddde24bdc981f5e26a628e65fb425a68db8a938f676;
+    uint8 v = 27;
+    bytes32 r = 0x6c879b734e8e1ec8e571be9265166eb707fc8f9321c352ac92d097a421247a61;
+    bytes32 s = 0x3547c3dc2b43d1525ae64bcc10681e5ded3a167d3fa288aabc053d20154b78cb;
 
     function claimAirdrop(address mostRecentlyDeployed) public {
         vm.startBroadcast();

@@ -1,4 +1,4 @@
--include .env
+-include .env constants.env
 
 .PHONY: all test clean deploy fund help install snapshot format anvil 
 
@@ -8,6 +8,18 @@ DEFAULT_ANVIL_ADDRESS := 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 DEFAULT_ANVIL_ADDRESS_2 := 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
 DEFAULT_ZKSYNC_ADDRESS := 0x36615Cf349d7F6344891B1e7CA7C72883F5dc049
 DEFAULT_ZKSYNC_LOCAL_KEY := 0x7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110
+
+# zkSync constants
+
+ROOT := 0x474d994c58e37b12085fdb7bc6bbcd046cf1907b90de3b7fb083cf3636c8ebfb
+PROOF_1 := 0xd1445c931158119b00449ffcac3c947d028c0c359c34a6646d95962b3b55c6ad
+PROOF_2 := 0x46f4c7c1c21e8a90c03949beda51d2d02d1ec75b55dd97a999d3edbafa5a1e2f
+V := 28
+R := 0x6c51680004e9ceaa47512c415b1c2068b341350db7edb2434c6f91570db112fe
+S := 0x78d88ea0d0b4a4c8896ba138fddb5b396dfecf1868d665b3bee56f5a19350e95
+AIRDROP_ADDRESS := 0xf2FcC18ED5072b48C0a076693eCa72fE840b3981
+TOKEN_ADDRESS := 0xb76eD02Dea1ba444609602BE5D587c4bFfd67153
+
 
 help:
 	@echo "Usage:"
@@ -51,7 +63,6 @@ endif
 deploy:
 	@forge script script/DeployMerkleAirdrop.s.sol:DeployMerkleAirdrop $(NETWORK_ARGS)
 
-ROOT := 0x474d994c58e37b12085fdb7bc6bbcd046cf1907b90de3b7fb083cf3636c8ebfb
 # As of writing, the Alchemy zkSync RPC URL is not working correctly 
 deploy-zk:
 	forge create src/MerkleAirdrop.sol:MerkleAirdrop --rpc-url http://127.0.0.1:8011 --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --constructor-args ${ROOT} $(shell forge create src/BagelToken.sol:BagelToken --rpc-url http://127.0.0.1:8011 --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --legacy --zksync | grep "Deployed to:" | awk '{print $$3}') --legacy --zksync
@@ -79,11 +90,12 @@ claim:;
 
 # Add below to a Bash script
 
-# AIRDROP_ADDRESS := 0x65C899B5fb8Eb9ae4da51D67E1fc417c7CB7e964
-# TOKEN_ADDRESS := 0x60Aa68f9D0D736B9a0a716d04323Ba3b22602840
+zk-get-message :; cast call ${AIRDROP_ADDRESS} "getMessageHash(address,uint256)" ${DEFAULT_ANVIL_ADDRESS} 25000000000000000000 --rpc-url http://127.0.0.1:8011
 
-# zk-claim :; cast send ${AIRDROP_ADDRESS} "claim(address,uint256,bytes32[],uint8,bytes32,bytes32)" ${DEFAULT_ANVIL_ADDRESS} 25000000000000000000 "[0xd1445c931158119b00449ffcac3c947d028c0c359c34a6646d95962b3b55c6ad,0x46f4c7c1c21e8a90c03949beda51d2d02d1ec75b55dd97a999d3edbafa5a1e2f]" 27 0x9558937d20fb3cdaead5e0a2c04292287d46e2363170d1ef5c21e36ddde4ce92 0x3730950052e181e017e6dfe70a6a21e576e29898a45f0e38ce4c628251a742ca --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --rpc-url http://127.0.0.1:8011
+zk-claim :; cast send ${AIRDROP_ADDRESS} "claim(address,uint256,bytes32[],uint8,bytes32,bytes32)" ${DEFAULT_ANVIL_ADDRESS} 25000000000000000000 "[${PROOF_1},${PROOF_2}]" ${V} ${R} ${S} --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --rpc-url http://127.0.0.1:8011
 
-# fund :; cast send ${TOKEN_ADDRESS} "mint(address,uint256)" ${DEFAULT_ZKSYNC_ADDRESS} 100000000000000000000 --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --rpc-url http://127.0.0.1:8011
+zk-fund :; cast send ${TOKEN_ADDRESS} "mint(address,uint256)" ${DEFAULT_ZKSYNC_ADDRESS} 100000000000000000000 --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --rpc-url http://127.0.0.1:8011
 
-# transfer :; cast send ${TOKEN_ADDRESS} "transfer(address,uint256)" ${AIRDROP_ADDRESS} 100000000000000000000 --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --rpc-url http://127.0.0.1:8011
+zk-transfer :; cast send ${TOKEN_ADDRESS} "transfer(address,uint256)" ${AIRDROP_ADDRESS} 100000000000000000000 --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --rpc-url http://127.0.0.1:8011
+
+zk-balance :; cast call ${TOKEN_ADDRESS} "balanceOf(address)" ${DEFAULT_ANVIL_ADDRESS} --rpc-url http://127.0.0.1:8011
