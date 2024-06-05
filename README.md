@@ -84,6 +84,12 @@ make deploy-zk-sepolia
 
 ## Interacting
 
+On a zkSync local node, run the following script by executing the following:
+
+```
+chmod +x interactZk.sh && ./interactZk.sh
+```
+
 On Anvil, run the following command after deploying the `MerkleAirdrop` contract:
 
 ```
