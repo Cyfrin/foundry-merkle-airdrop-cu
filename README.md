@@ -35,39 +35,94 @@ This is a section of the Cyfrin Advanced Foundry Course.
 ## Quickstart
 
 ```
-git clone https://github.com/Cyfrin/merkle-airdrop-f23
-cd merkle-airdrop-f23
+git clone https://github.com/ciara/merkle-airdrop
+cd merkle-airdrop
 forge build
 ```
 
-### Optional Gitpod
-
-If you can't or don't want to run and install locally, you can work with this repo in Gitpod. If you do this, you can skip the `clone this repo` part.
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#github.com/PatrickAlphaC/foundry-fund-me-f23)
-
 # Usage
+
+If not updating the array of addresses, skip to [deploy](#deploy)
+
+If updating the array of addresses, you will need to follow the following:
+
+First, the array of addresses to airdrop to needs to be updated in `GenerateInput.s.sol. To generate the input file and then the merkle root and proofs, run the following:
+
+Using make:
+
+```
+make merkle
+```
+
+Or using the commands directly:
+
+```
+forge script script/GenerateInput.s.sol:GenerateInput && forge script script/MakeMerkle.s.sol:MakeMerkle
+```
+
+Then, retrieve the `root` from `script/target/output.json` and paste it in the `Makefile` as `ROOT` (for zkSync deployments) and update `s_merkleRoot` in `DeployMerkleAirdrop.s.sol` for Ethereum/Anvil deployments.
 
 ## Deploy
 
+Deploy to Anvil:
+
 ```
-forge script script/DeployFundMe.s.sol
+make deploy
+```
+
+Deploy to a zkSync local node:
+
+```
+make deploy-zk
+```
+
+Deploy to zkSync Sepolia:
+
+```
+make deploy-zk-sepolia
+```
+
+## Interacting
+
+On Anvil, run the following command after deploying the `MerkleAirdrop` contract:
+
+```
+make sign
+```
+
+Retrieve the `v`, `r`, and `s` values outputted to the terminal and add them to `Interact.s.sol`. Additionally, if you have modified the claiming addresses in the merkle tree, you will need to update the proofs in this file too (which you can get from `output.json`)
+
+Then run the following command:
+
+```
+make claim
+```
+
+Then, check the claiming address balance has increased by running
+
+```
+cast call ${BAGEL_TOKEN} "balanceOf(address)" 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+```
+
+Where ${BAGEL_TOKEN} is the contract address of the Bagel Token which you can find in your terminal and 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 is the default anvil address which has recieved the airdropped tokens using the second default anvil key (0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d) to pay the gas using their signature
+
+Then run the following to convert the hex to decimal on the output:
+
+```
+cast --to-dec ${BALANCE_HEX}
 ```
 
 ## Testing
 
-We talk about 4 test tiers in the video. 
-
-1. Unit
-2. Integration
-3. Forked
-4. Staging
-
-This repo we cover #1 and #3. 
-
 
 ```
 forge test
+```
+
+for for zkSync
+
+```
+make zktest
 ```
 
 or 
@@ -146,7 +201,7 @@ make deploy-zk
 
 1. Setup environment variables
 
-You'll want to set your `SEPOLIA_RPC_URL` and `PRIVATE_KEY` as environment variables. You can add them to a `.env` file, similar to what you see in `.env.example`.
+You'll want to set your `SEPOLIA_RPC_URL`, `ZKSYNC_SEPOLIA_RPC_URL` and `PRIVATE_KEY` as environment variables. You can add them to a `.env` file, similar to what you see in `.env.example`.
 
 - `PRIVATE_KEY`: The private key of your account (like from [metamask](https://metamask.io/)). **NOTE:** FOR DEVELOPMENT, PLEASE USE A KEY THAT DOESN'T HAVE ANY REAL FUNDS ASSOCIATED WITH IT.
   - You can [learn how to export it here](https://metamask.zendesk.com/hc/en-us/articles/360015289632-How-to-Export-an-Account-Private-Key).
@@ -161,7 +216,7 @@ Head over to [faucets.chain.link](https://faucets.chain.link/) and get some test
 3. Deploy
 
 ```
-forge script script/DeployFundMe.s.sol --rpc-url $SEPOLIA_RPC_URL --private-key $PRIVATE_KEY --broadcast --verify --etherscan-api-key $ETHERSCAN_API_KEY
+make deploy ${--network sepolia}
 ```
 
 ## Estimate gas
