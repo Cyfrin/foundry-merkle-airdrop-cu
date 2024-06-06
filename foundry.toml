@@ -4,12 +4,23 @@ out = "out"
 libs = ["lib"]
 ffi = true
 solc = "0.8.24"
-fs_permissions = [{ access = "read-write", path = "./"}]
+fs_permissions = [{ access = "read-write", path = "./" }]
 remappings = [
     'murky/=lib/murky/',
     '@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/',
-    'foundry-devops/=lib/foundry-devops'
-
+    'foundry-devops/=lib/foundry-devops',
+    'forge-std/=lib/forge-std/src/',
 ]
+
+[fmt]
+bracket_spacing = true
+int_types = "long"
+line_length = 120
+multiline_func_header = "all"
+number_underscore = "thousands"
+quote_style = "double"
+tab_width = 4
+wrap_comments = true
+
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
