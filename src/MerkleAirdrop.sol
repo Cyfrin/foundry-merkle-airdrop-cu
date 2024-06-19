@@ -19,13 +19,12 @@ contract MerkleAirdrop is EIP712 {
     using SafeERC20 for IERC20; // Prevent sending tokens to recipients who can’t receive
 
     error MerkleAirdrop__InvalidProof();
-    error MerkleAirdrop__TransferFailed();
     error MerkleAirdrop__AlreadyClaimed();
     error MerkleAirdrop__InvalidSignature();
 
     IERC20 private immutable i_airdropToken;
     bytes32 private immutable i_merkleRoot;
-    mapping(address user => bool claimed) private s_hasClaimed;
+    mapping(address user => bool claimed) private s_hasClaimed; // COME BACK HERE
 
     bytes32 private constant MESSAGE_TYPEHASH = keccak256("AirdropClaim(address account,uint256 amount)");
 
