@@ -7,11 +7,11 @@ import {console} from "forge-std/console.sol";
 
 // Merkle tree input file generator script
 contract GenerateInput is Script {
-    uint256 amount = 25 * 1e18;
+    uint256 private constant AMOUNT = 25 * 1e18;
     string[] types = new string[](2);
     uint256 count;
     string[] whitelist = new string[](4);
-    string private inputPath = "/script/target/input.json";
+    string private constant  INPUT_PATH = "/script/target/input.json";
     
     function run() public {
         types[0] = "address";
@@ -23,14 +23,14 @@ contract GenerateInput is Script {
         count = whitelist.length;
         string memory input = _createJSON();
         // write to the output file the stringified output json tree dumpus 
-        vm.writeFile(string.concat(vm.projectRoot(), inputPath), input);
+        vm.writeFile(string.concat(vm.projectRoot(), INPUT_PATH), input);
 
-        console.log("DONE: The output is found at %s", inputPath);
+        console.log("DONE: The output is found at %s", INPUT_PATH);
     }
 
     function _createJSON() internal view returns (string memory) {
         string memory countString = vm.toString(count); // convert count to string
-        string memory amountString = vm.toString(amount); // convert amount to string
+        string memory amountString = vm.toString(AMOUNT); // convert amount to string
         string memory json = string.concat('{ "types": ["address", "uint"], "count":', countString, ',"values": {');
         for (uint256 i = 0; i < whitelist.length; i++) {
             if (i == whitelist.length - 1) {
