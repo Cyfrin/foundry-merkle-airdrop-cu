@@ -14,7 +14,7 @@ contract ClaimAirdrop is Script {
     bytes32[] private proof = [PROOF_ONE, PROOF_TWO];
 
     // this will change every time!
-    bytes private SIGNATURE = hex"6c879b734e8e1ec8e571be9265166eb707fc8f9321c352ac92d097a421247a613547c3dc2b43d1525ae64bcc10681e5ded3a167d3fa288aabc053d20154b78cb1b";
+    bytes private SIGNATURE = hex"04209f8dfd0ef06724e83d623207ba8c33b6690e08772f8887a4eaf9a66b9182188938adea374fa542ad5ddde24bdc981f5e26a628e65fb425a68db8a938f6761c";
 
     function claimAirdrop(address mostRecentlyDeployed) public {
         (bytes32 r, bytes32 s, uint8 v) = splitSignature(SIGNATURE);
@@ -47,33 +47,6 @@ contract ClaimAirdrop is Script {
             s := mload(add(sig, 64))
             v := byte(0, mload(add(sig, 96)))
         }
-    }
-}
-
-// Do not use your private key in production code - this is the anvil default private key
-contract SignMessage is Script {
-    uint256 constant ANVIL_PRIV_KEY =  0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
-    address constant CLAIMING_ADDRESS = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
-    uint256 constant AMOUNT_TO_COLLECT = (25 * 1e18); // 25.000000
-
-    function signMessage(address mostRecentlyDeployed) public returns (uint8 v, bytes32 r, bytes32 s) {
-        vm.startBroadcast();
-        bytes32 digest = MerkleAirdrop(mostRecentlyDeployed).getMessageHash(CLAIMING_ADDRESS, AMOUNT_TO_COLLECT);
-        (v, r, s) = vm.sign(ANVIL_PRIV_KEY, digest);
-        vm.stopBroadcast();
-        console.log("v:");
-        console.log(v);
-        console.log("r:");
-        console.logBytes32(r);
-        console.log("s:");
-        console.logBytes32(s);
-        console.log("digest:");
-        console.logBytes32(digest);
-    }
-
-    function run() external {
-        address mostRecentlyDeployed = DevOpsTools.get_most_recent_deployment("MerkleAirdrop", block.chainid);
-        signMessage(mostRecentlyDeployed);
     }
 }
 

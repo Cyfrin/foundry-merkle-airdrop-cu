@@ -201,10 +201,11 @@ Swap back to vanilla foundry and run an anvil node:
 foundryup
 make anvil
 make deploy
-# Make note of the BagelToken address
+# Copy the BagelToken address & Airdrop contract address
 ```
+Copy the Bagel Token and Aidrop contract addresses and paste them into the `AIRDROP_ADDRESS` and `TOKEN_ADDRESS` variables in the `MakeFile`
 
-The following steps allow the second default anvil address (0x70997970C51812dc3A010C7d01b50e0d17dc79C8) to call claim and pay for the gas on behalf of the first default anvil address (0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266) which will recieve the airdrop. 
+The following steps allow the second default anvil address (`0x70997970C51812dc3A010C7d01b50e0d17dc79C8`) to call claim and pay for the gas on behalf of the first default anvil address (`0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`) which will recieve the airdrop. 
 
 ### Sign your airdrop claim  
 
@@ -213,7 +214,9 @@ The following steps allow the second default anvil address (0x70997970C51812dc3A
 make sign
 ```
 
-Retrieve the signature bytes outputted to the terminal and add them to `Interact.s.sol`. Additionally, if you have modified the claiming addresses in the merkle tree, you will need to update the proofs in this file too (which you can get from `output.json`)
+Retrieve the signature bytes outputted to the terminal and add them to `Interact.s.sol` *making sure to remove the `0x` prefix*. 
+
+Additionally, if you have modified the claiming addresses in the merkle tree, you will need to update the proofs in this file too (which you can get from `output.json`)
 
 
 ### Claim your airdrop
