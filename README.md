@@ -171,6 +171,8 @@ make deploy-zk-sepolia
 
 ## Interacting - zkSync local network
 
+The following steps allow the second default anvil address (0x70997970C51812dc3A010C7d01b50e0d17dc79C8) to call claim and pay for the gas on behalf of the first default anvil address (0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266) which will recieve the airdrop. 
+
 ### Setup local zksync node, deploy contracts, and run airdrop claim
 
 > See [Deploy to a zkSync local node prerequisites](#zksync-prerequisites) for prerequisites.
@@ -202,6 +204,8 @@ make deploy
 # Make note of the BagelToken address
 ```
 
+The following steps allow the second default anvil address (0x70997970C51812dc3A010C7d01b50e0d17dc79C8) to call claim and pay for the gas on behalf of the first default anvil address (0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266) which will recieve the airdrop. 
+
 ### Sign your airdrop claim  
 
 ```bash
@@ -209,7 +213,7 @@ make deploy
 make sign
 ```
 
-Retrieve the `v`, `r`, and `s` values outputted to the terminal and add them to `Interact.s.sol`. Additionally, if you have modified the claiming addresses in the merkle tree, you will need to update the proofs in this file too (which you can get from `output.json`)
+Retrieve the signature bytes outputted to the terminal and add them to `Interact.s.sol`. Additionally, if you have modified the claiming addresses in the merkle tree, you will need to update the proofs in this file too (which you can get from `output.json`)
 
 
 ### Claim your airdrop
@@ -225,17 +229,11 @@ make claim
 Then, check the claiming address balance has increased by running
 
 ```bash
-export BAGEL_TOKEN=0x.... # Bagel Token address
-cast call ${BAGEL_TOKEN} "balanceOf(address)" 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --rpc-url http://127.0.0.1:8545
+make balance
 ```
 
-Where `${BAGEL_TOKEN}` is the contract address of the Bagel Token which you can find in your terminal and `0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266` is the default anvil address which has recieved the airdropped tokens. (check the other anvil addresses just in case you deployed with a different address!)
+NOTE: `0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266` is the default anvil address which has recieved the airdropped tokens.
 
-Then run the following to convert the hex to decimal on the output:
-
-```bash
-0x0000000000000000000000000000000000000000000000015af1d78b58c40000 ${BALANCE_HEX}
-```
 
 ## Testing
 

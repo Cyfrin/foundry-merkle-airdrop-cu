@@ -11,18 +11,17 @@ contract ClaimAirdrop is Script {
 
     bytes32 private constant PROOF_ONE = 0xd1445c931158119b00449ffcac3c947d028c0c359c34a6646d95962b3b55c6ad;
     bytes32 private constant PROOF_TWO = 0x46f4c7c1c21e8a90c03949beda51d2d02d1ec75b55dd97a999d3edbafa5a1e2f;
-    bytes32[] private constant PROOF = [PROOF_ONE, PROOF_TWO];
+    bytes32[] private proof = [PROOF_ONE, PROOF_TWO];
 
-    // These are from the default anvil key! Do not use in production
-    // These will change every time the Merkle Airdrop contract is deployed
-    uint8 constant V = 27;
-    bytes32 constant R = 0x6c879b734e8e1ec8e571be9265166eb707fc8f9321c352ac92d097a421247a61;
-    bytes32 constant S = 0x3547c3dc2b43d1525ae64bcc10681e5ded3a167d3fa288aabc053d20154b78cb;
+    // this will change every time!
+    bytes private SIGNATURE = hex"6c879b734e8e1ec8e571be9265166eb707fc8f9321c352ac92d097a421247a613547c3dc2b43d1525ae64bcc10681e5ded3a167d3fa288aabc053d20154b78cb1b";
 
     function claimAirdrop(address mostRecentlyDeployed) public {
+        (bytes32 r, bytes32 s, uint8 v) = splitSignature(SIGNATURE);
+        console.log(v);
         vm.startBroadcast();
         console.log("Claiming Airdrop");
-        MerkleAirdrop(mostRecentlyDeployed).claim(CLAIMING_ADDRESS, AMOUNT_TO_COLLECT, PROOF, V, R, S);
+        MerkleAirdrop(mostRecentlyDeployed).claim(CLAIMING_ADDRESS, AMOUNT_TO_COLLECT, proof, v, r, s);
         vm.stopBroadcast();
         console.log("Claimed Airdrop");
     }
@@ -30,6 +29,24 @@ contract ClaimAirdrop is Script {
     function run() external {
         address mostRecentlyDeployed = DevOpsTools.get_most_recent_deployment("MerkleAirdrop", block.chainid);
         claimAirdrop(mostRecentlyDeployed);
+    }
+
+    function splitSignature(bytes memory sig)
+        internal
+        pure
+        returns (
+            bytes32 r,
+            bytes32 s,
+            uint8 v
+        )
+    {
+        require(sig.length == 65, "invalid signature length");
+
+        assembly {
+            r := mload(add(sig, 32))
+            s := mload(add(sig, 64))
+            v := byte(0, mload(add(sig, 96)))
+        }
     }
 }
 
@@ -50,6 +67,8 @@ contract SignMessage is Script {
         console.logBytes32(r);
         console.log("s:");
         console.logBytes32(s);
+        console.log("digest:");
+        console.logBytes32(digest);
     }
 
     function run() external {

@@ -14,12 +14,10 @@ DEFAULT_ZKSYNC_LOCAL_KEY := 0x7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c
 ROOT := 0x474d994c58e37b12085fdb7bc6bbcd046cf1907b90de3b7fb083cf3636c8ebfb
 PROOF_1 := 0xd1445c931158119b00449ffcac3c947d028c0c359c34a6646d95962b3b55c6ad
 PROOF_2 := 0x46f4c7c1c21e8a90c03949beda51d2d02d1ec75b55dd97a999d3edbafa5a1e2f
-V := 28
-R := 0x6c51680004e9ceaa47512c415b1c2068b341350db7edb2434c6f91570db112fe
-S := 0x78d88ea0d0b4a4c8896ba138fddb5b396dfecf1868d665b3bee56f5a19350e95
-AIRDROP_ADDRESS := 0xf2FcC18ED5072b48C0a076693eCa72fE840b3981
-TOKEN_ADDRESS := 0xb76eD02Dea1ba444609602BE5D587c4bFfd67153
+AIRDROP_AMOUNT := 25000000000000000000
 
+AIRDROP_ADDRESS := 0x5FC8d32690cc91D4c39d9d3abcBD16989F875707
+TOKEN_ADDRESS := 0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9
 
 help:
 	@echo "Usage:"
@@ -82,17 +80,18 @@ merkle :; forge script script/GenerateInput.s.sol:GenerateInput && forge script 
 
 zktest :; foundryup-zksync && forge test --zksync && foundryup
 
-sign:;
-	@forge script script/Interact.s.sol:SignMessage --sender ${DEFAULT_ANVIL_ADDRESS} --rpc-url http://localhost:8545 --private-key $(DEFAULT_ANVIL_KEY) --broadcast
+sign :; 
+	cast wallet sign --private-key ${DEFAULT_ANVIL_KEY} --no-hash ${shell cast call ${AIRDROP_ADDRESS} "getMessageHash(address,uint256)" ${DEFAULT_ANVIL_ADDRESS} ${AIRDROP_AMOUNT} --rpc-url http://localhost:8545}
 
 claim:;
 	@forge script script/Interact.s.sol:ClaimAirdrop --sender ${DEFAULT_ANVIL_ADDRESS_2} --rpc-url http://localhost:8545 --private-key $(DEFAULT_ANVIL_KEY_2) --broadcast
 
-# Add below to a Bash script
+balance :; 
+	@cast --to-dec ${shell cast call ${TOKEN_ADDRESS} "balanceOf(address)" ${DEFAULT_ANVIL_ADDRESS} --rpc-url http://localhost:8545}
 
-zk-get-message :; cast call ${AIRDROP_ADDRESS} "getMessageHash(address,uint256)" ${DEFAULT_ANVIL_ADDRESS} 25000000000000000000 --rpc-url http://127.0.0.1:8011
+zk-get-message :; cast call ${AIRDROP_ADDRESS} "getMessageHash(address,uint256)" ${DEFAULT_ANVIL_ADDRESS} ${AIRDROP_AMOUNT} --rpc-url http://127.0.0.1:8011
 
-zk-claim :; cast send ${AIRDROP_ADDRESS} "claim(address,uint256,bytes32[],uint8,bytes32,bytes32)" ${DEFAULT_ANVIL_ADDRESS} 25000000000000000000 "[${PROOF_1},${PROOF_2}]" ${V} ${R} ${S} --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --rpc-url http://127.0.0.1:8011
+zk-claim :; cast send ${AIRDROP_ADDRESS} "claim(address,uint256,bytes32[],uint8,bytes32,bytes32)" ${DEFAULT_ANVIL_ADDRESS} ${AIRDROP_AMOUNT} "[${PROOF_1},${PROOF_2}]" ${V} ${R} ${S} --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --rpc-url http://127.0.0.1:8011
 
 zk-fund :; cast send ${TOKEN_ADDRESS} "mint(address,uint256)" ${DEFAULT_ZKSYNC_ADDRESS} 100000000000000000000 --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --rpc-url http://127.0.0.1:8011
 
