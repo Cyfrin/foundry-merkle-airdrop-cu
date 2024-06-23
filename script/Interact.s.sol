@@ -13,17 +13,25 @@ contract ClaimAirdrop is Script {
     bytes32 private constant PROOF_TWO = 0x46f4c7c1c21e8a90c03949beda51d2d02d1ec75b55dd97a999d3edbafa5a1e2f;
     bytes32[] private proof = [PROOF_ONE, PROOF_TWO];
     
-     // the signature will change every time you redeploy the airdrop contract!
-    uint8 constant V = 28;
-    bytes32 constant R = 0x04209f8dfd0ef06724e83d623207ba8c33b6690e08772f8887a4eaf9a66b9182;
-    bytes32 constant S = 0x188938adea374fa542ad5ddde24bdc981f5e26a628e65fb425a68db8a938f676;
+    // the signature will change every time you redeploy the airdrop contract!
+    bytes private SIGNATURE = hex"fbd2270e6f23fb5fe9248480c0f4be8a4e9bd77c3ad0b1333cc60b5debc511602a2a06c24085d8d7c038bad84edc53664c8ce0346caeaa3570afec0e61144dc11c";
 
     function claimAirdrop(address airdrop) public {
         vm.startBroadcast();
+        (uint8 v, bytes32 r, bytes32 s) = splitSignature(SIGNATURE);
         console.log("Claiming Airdrop");
-        MerkleAirdrop(airdrop).claim(CLAIMING_ADDRESS, AMOUNT_TO_COLLECT, proof, V, R, S);
+        MerkleAirdrop(airdrop).claim(CLAIMING_ADDRESS, AMOUNT_TO_COLLECT, proof, v, r, s);
         vm.stopBroadcast();
         console.log("Claimed Airdrop");
+    }
+
+    function splitSignature(bytes memory sig) public returns (uint8 v, bytes32 r, bytes32 s) {
+        require(sig.length == 65, "invalid signature length");
+        assembly {
+            r := mload(add(sig, 32))
+            s := mload(add(sig, 64))
+            v := byte(0, mload(add(sig, 96)))
+        }
     }
 
     function run() external {
