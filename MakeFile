@@ -1,4 +1,4 @@
--include .env constants.env
+-include .env
 
 .PHONY: all test clean deploy fund help install snapshot format anvil 
 
@@ -81,7 +81,7 @@ merkle :; forge script script/GenerateInput.s.sol:GenerateInput && forge script 
 zktest :; foundryup-zksync && forge test --zksync && foundryup
 
 sign :; 
-	cast wallet sign --private-key ${DEFAULT_ANVIL_KEY} --no-hash ${shell cast call ${AIRDROP_ADDRESS} "getMessageHash(address,uint256)" ${DEFAULT_ANVIL_ADDRESS} ${AIRDROP_AMOUNT} --rpc-url http://localhost:8545}
+	@forge script script/Sign.s.sol:Sign --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --rpc-url http://localhost:8545 --broadcast
 
 claim:;
 	@forge script script/Interact.s.sol:ClaimAirdrop --sender ${DEFAULT_ANVIL_ADDRESS_2} --rpc-url http://localhost:8545 --private-key $(DEFAULT_ANVIL_KEY_2) --broadcast

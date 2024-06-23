@@ -12,16 +12,16 @@ contract ClaimAirdrop is Script {
     bytes32 private constant PROOF_ONE = 0xd1445c931158119b00449ffcac3c947d028c0c359c34a6646d95962b3b55c6ad;
     bytes32 private constant PROOF_TWO = 0x46f4c7c1c21e8a90c03949beda51d2d02d1ec75b55dd97a999d3edbafa5a1e2f;
     bytes32[] private proof = [PROOF_ONE, PROOF_TWO];
+    
+     // the signature will change every time you redeploy the airdrop contract!
+    uint8 constant V = 27;
+    bytes32 constant R = 0xb1f6e48bbf8c55e2c76e9387c3caeb6cd1b9fa03549cdae0ce41f29cedafd906;
+    bytes32 constant S = 0x7170b5d8d4373caa759e58d1aeba18fac1f5e8139cc293cfa6948d66a9c47853;
 
-    // this will change every time!
-    bytes private SIGNATURE = hex"04209f8dfd0ef06724e83d623207ba8c33b6690e08772f8887a4eaf9a66b9182188938adea374fa542ad5ddde24bdc981f5e26a628e65fb425a68db8a938f6761c";
-
-    function claimAirdrop(address mostRecentlyDeployed) public {
-        (bytes32 r, bytes32 s, uint8 v) = splitSignature(SIGNATURE);
-        console.log(v);
+    function claimAirdrop(address airdrop) public {
         vm.startBroadcast();
         console.log("Claiming Airdrop");
-        MerkleAirdrop(mostRecentlyDeployed).claim(CLAIMING_ADDRESS, AMOUNT_TO_COLLECT, proof, v, r, s);
+        MerkleAirdrop(airdrop).claim(CLAIMING_ADDRESS, AMOUNT_TO_COLLECT, proof, V, R, S);
         vm.stopBroadcast();
         console.log("Claimed Airdrop");
     }
@@ -29,24 +29,6 @@ contract ClaimAirdrop is Script {
     function run() external {
         address mostRecentlyDeployed = DevOpsTools.get_most_recent_deployment("MerkleAirdrop", block.chainid);
         claimAirdrop(mostRecentlyDeployed);
-    }
-
-    function splitSignature(bytes memory sig)
-        internal
-        pure
-        returns (
-            bytes32 r,
-            bytes32 s,
-            uint8 v
-        )
-    {
-        require(sig.length == 65, "invalid signature length");
-
-        assembly {
-            r := mload(add(sig, 32))
-            s := mload(add(sig, 64))
-            v := byte(0, mload(add(sig, 96)))
-        }
     }
 }
 
