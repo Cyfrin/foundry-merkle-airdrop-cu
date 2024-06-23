@@ -14,9 +14,9 @@ contract ClaimAirdrop is Script {
     bytes32[] private proof = [PROOF_ONE, PROOF_TWO];
     
      // the signature will change every time you redeploy the airdrop contract!
-    uint8 constant V = 27;
-    bytes32 constant R = 0xb1f6e48bbf8c55e2c76e9387c3caeb6cd1b9fa03549cdae0ce41f29cedafd906;
-    bytes32 constant S = 0x7170b5d8d4373caa759e58d1aeba18fac1f5e8139cc293cfa6948d66a9c47853;
+    uint8 constant V = 28;
+    bytes32 constant R = 0x04209f8dfd0ef06724e83d623207ba8c33b6690e08772f8887a4eaf9a66b9182;
+    bytes32 constant S = 0x188938adea374fa542ad5ddde24bdc981f5e26a628e65fb425a68db8a938f676;
 
     function claimAirdrop(address airdrop) public {
         vm.startBroadcast();
