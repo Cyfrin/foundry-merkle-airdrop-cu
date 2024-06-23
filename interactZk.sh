@@ -27,7 +27,7 @@ echo -n "$MESSAGE_HASH" >> digest.txt
 
 # Run SignZkSync script
 echo "Signing message..."
-SIGN_OUTPUT=$(forge script script/Sign.s.sol:SignZk --private-key ${DEFAULT_ANVIL_KEY})
+SIGN_OUTPUT=$(forge script script/Sign.s.sol:SignZk --private-key ${DEFAULT_ANVIL_KEY} --sender ${DEFAULT_ANVIL_ADDRESS} --rpc-url http://127.0.0.1:8011)
 
 V=$(echo "$SIGN_OUTPUT" | grep -A 1 "v value:" | tail -n 1 | xargs)
 R=$(echo "$SIGN_OUTPUT" | grep -A 1 "r value:" | tail -n 1 | xargs)

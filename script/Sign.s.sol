@@ -30,8 +30,10 @@ contract SignZk is Script {
     uint256 amountToCollect = (25 * 1e18); // 25.000000
 
     function signMessage() public returns (uint8 v, bytes32 r, bytes32 s) {
+        vm.startBroadcast();
         bytes32 digest = vm.parseBytes32(vm.readFile("digest.txt"));
         (v, r, s) = vm.sign(msg.sender, digest);
+        vm.stopBroadcast();
         console.log("v value:");
         console.log(v);
         console.log("r value:");
