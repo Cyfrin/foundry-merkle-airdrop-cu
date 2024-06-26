@@ -27,7 +27,7 @@ contract ClaimAirdrop is Script {
         console.log("Claimed Airdrop");
     }
 
-    function splitSignature(bytes memory sig) public returns (uint8 v, bytes32 r, bytes32 s) {
+    function splitSignature(bytes memory sig) public pure returns (uint8 v, bytes32 r, bytes32 s) {
         if (sig.length != 65) {
             revert __ClaimAirdropScript__InvalidSignatureLength();
         }   
