@@ -4,6 +4,8 @@ pragma solidity ^0.8.24;
 import { Script, console } from "forge-std/Script.sol";
 
 contract SplitSignature is Script {
+    error __SplitSignatureScript__InvalidSignatureLength();
+
     function splitSignature(bytes memory sig)
         internal
         pure
@@ -13,7 +15,9 @@ contract SplitSignature is Script {
             bytes32 s
         )
     {
-        require(sig.length == 65, "invalid signature length");
+        if (sig.length != 65) {
+            revert __SplitSignatureScript__InvalidSignatureLength();
+        }
 
         assembly {
             r := mload(add(sig, 32))
