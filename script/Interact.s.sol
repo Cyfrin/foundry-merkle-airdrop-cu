@@ -16,6 +16,8 @@ contract ClaimAirdrop is Script {
     // the signature will change every time you redeploy the airdrop contract!
     bytes private SIGNATURE = hex"fbd2270e6f23fb5fe9248480c0f4be8a4e9bd77c3ad0b1333cc60b5debc511602a2a06c24085d8d7c038bad84edc53664c8ce0346caeaa3570afec0e61144dc11c";
 
+    error __ClaimAirdropScript__InvalidSignatureLength();
+
     function claimAirdrop(address airdrop) public {
         vm.startBroadcast();
         (uint8 v, bytes32 r, bytes32 s) = splitSignature(SIGNATURE);
@@ -26,7 +28,9 @@ contract ClaimAirdrop is Script {
     }
 
     function splitSignature(bytes memory sig) public returns (uint8 v, bytes32 r, bytes32 s) {
-        require(sig.length == 65, "invalid signature length");
+        if (sig.length != 65) {
+            revert __ClaimAirdropScript__InvalidSignatureLength();
+        }   
         assembly {
             r := mload(add(sig, 32))
             s := mload(add(sig, 64))
