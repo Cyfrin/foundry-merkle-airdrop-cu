@@ -102,7 +102,7 @@ contract MakeMerkle is Script, ScriptHelper {
             // is declared in memory 
             // hash the encoded address and amount 
             // bytes.concat turns from bytes32 to bytes 
-            // hash again because merkle stuff says so (ask P dog)
+            // hash again because preimage attack
             leafs[i] = keccak256(bytes.concat(keccak256(ltrim64(abi.encode(data)))));
             // Converts a string array into a JSON array string.
             // store the corresponding values/inputs for each leaf node
