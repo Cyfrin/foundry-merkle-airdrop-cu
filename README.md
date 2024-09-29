@@ -43,8 +43,8 @@ To get started, we are assuming you're working with vanilla `foundry` and not `f
 ## Quickstart
 
 ```bash
-git clone https://github.com/ciara/merkle-airdrop
-cd merkle-airdrop
+git clone https://github.com/Cyfrin/foundry-merkle-airdrop-cu
+cd foundry-merkle-airdrop-cu
 make # or forge install && forge build if you don't have make 
 ```
 
