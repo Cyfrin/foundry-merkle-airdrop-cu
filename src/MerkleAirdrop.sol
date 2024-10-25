@@ -68,7 +68,7 @@ contract MerkleAirdrop is EIP712 {
         // Verify the merkle proof
         // calculate the leaf node hash
         bytes32 leaf = keccak256(bytes.concat(keccak256(abi.encode(account, amount))));
-        // verify the merkle proof (TODO: understand verify)
+        // verify the merkle proof
         if (!MerkleProof.verify(merkleProof, i_merkleRoot, leaf)) {
             revert MerkleAirdrop__InvalidProof();
         }
