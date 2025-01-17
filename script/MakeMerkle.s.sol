@@ -13,7 +13,7 @@ import {ScriptHelper} from "murky/script/common/ScriptHelper.sol";
 // 2. Run `forge script script/Merkle.s.sol`
 // 3. The output file will be generated in /script/target/output.json
 
-/** 
+/**
  * @title MakeMerkle
  * @author Ciara Nightingale
  * @author Cyfrin
@@ -26,7 +26,7 @@ import {ScriptHelper} from "murky/script/common/ScriptHelper.sol";
 contract MakeMerkle is Script, ScriptHelper {
     using stdJson for string; // enables us to use the json cheatcodes for strings
 
-    Merkle private m = new Merkle(); // instance of the merkle contract from Murky to do shit 
+    Merkle private m = new Merkle(); // instance of the merkle contract from Murky to do shit
 
     string private inputPath = "/script/target/input.json";
     string private outputPath = "/script/target/output.json";
@@ -36,7 +36,7 @@ contract MakeMerkle is Script, ScriptHelper {
     uint256 private count = elements.readUint(".count"); // get the number of leaf nodes
 
     // make three arrays the same size as the number of leaf nodes
-    bytes32[] private leafs = new bytes32[](count);  
+    bytes32[] private leafs = new bytes32[](count);
 
     string[] private inputs = new string[](count);
     string[] private outputs = new string[](count);
@@ -99,9 +99,9 @@ contract MakeMerkle is Script, ScriptHelper {
             // abi encode the data array (each element is a bytes32 representation for the address and the amount)
             // Helper from Murky (ltrim64) Returns the bytes with the first 64 bytes removed 
             // ltrim64 removes the offset and length from the encoded bytes. There is an offset because the array
-            // is declared in memory 
-            // hash the encoded address and amount 
-            // bytes.concat turns from bytes32 to bytes 
+            // is declared in memory
+            // hash the encoded address and amount
+            // bytes.concat turns from bytes32 to bytes
             // hash again because preimage attack
             leafs[i] = keccak256(bytes.concat(keccak256(ltrim64(abi.encode(data)))));
             // Converts a string array into a JSON array string.
@@ -110,7 +110,7 @@ contract MakeMerkle is Script, ScriptHelper {
         }
 
         for (uint256 i = 0; i < count; ++i) {
-            // get proof gets the nodes needed for the proof & strigify (from helper lib)
+            // get proof gets the nodes needed for the proof & stringify (from helper lib)
             string memory proof = bytes32ArrayToString(m.getProof(leafs, i));
             // get the root hash and stringify
             string memory root = vm.toString(m.getRoot(leafs));
@@ -125,7 +125,7 @@ contract MakeMerkle is Script, ScriptHelper {
 
         // stringify the array of strings to a single string
         output = stringArrayToArrayString(outputs);
-        // write to the output file the stringified output json tree dumpus 
+        // write to the output file the stringified output json (tree dump)
         vm.writeFile(string.concat(vm.projectRoot(), outputPath), output);
 
         console.log("DONE: The output is found at %s", outputPath);

@@ -12,7 +12,7 @@ contract GenerateInput is Script {
     uint256 count;
     string[] whitelist = new string[](4);
     string private constant  INPUT_PATH = "/script/target/input.json";
-    
+
     function run() public {
         types[0] = "address";
         types[1] = "uint";
@@ -22,7 +22,7 @@ contract GenerateInput is Script {
         whitelist[3] = "0xf6dBa02C01AF48Cf926579F77C9f874Ca640D91D";
         count = whitelist.length;
         string memory input = _createJSON();
-        // write to the output file the stringified output json tree dumpus 
+        // write to the output file the stringified output json tree dump
         vm.writeFile(string.concat(vm.projectRoot(), INPUT_PATH), input);
 
         console.log("DONE: The output is found at %s", INPUT_PATH);
@@ -40,7 +40,7 @@ contract GenerateInput is Script {
             }
         }
         json = string.concat(json, '} }');
-        
+
         return json;
     }
 }
