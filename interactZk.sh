@@ -20,7 +20,7 @@ echo "Token contract deployed at: $TOKEN_ADDRESS"
 
 # Deploy MerkleAirdrop contract
 echo "Deploying MerkleAirdrop contract..."
-AIRDROP_ADDRESS=$(forge create src/MerkleAirdrop.sol:MerkleAirdrop --rpc-url http://127.0.0.1:8011 --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY} --constructor-args ${ROOT} ${TOKEN_ADDRESS} --legacy --zksync | awk '/Deployed to:/ {print $3}' )
+AIRDROP_ADDRESS=$(forge create src/MerkleAirdrop.sol:MerkleAirdrop --rpc-url http://127.0.0.1:8011 --private-key ${DEFAULT_ZKSYNC_LOCAL_KEY}  --legacy --zksync --constructor-args ${ROOT} ${TOKEN_ADDRESS} | awk '/Deployed to:/ {print $3}' )
 echo "MerkleAirdrop contract deployed at: $AIRDROP_ADDRESS"
 
 # Get message hash
