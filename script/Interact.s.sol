@@ -10,7 +10,7 @@ contract ClaimAirdrop is Script {
     uint256 private constant AMOUNT_TO_COLLECT = (25 * 1e18); // 25.000000
 
     bytes32 private constant PROOF_ONE = 0xd1445c931158119b00449ffcac3c947d028c0c359c34a6646d95962b3b55c6ad;
-    bytes32 private constant PROOF_TWO = 0x46f4c7c1c21e8a90c03949beda51d2d02d1ec75b55dd97a999d3edbafa5a1e2f;
+    bytes32 private constant PROOF_TWO = 0xe5ebd1e1b5a5478a944ecab36a9a954ac3b6b8216875f6524caa7a1d87096576;
     bytes32[] private proof = [PROOF_ONE, PROOF_TWO];
     
     // the signature will change every time you redeploy the airdrop contract!
