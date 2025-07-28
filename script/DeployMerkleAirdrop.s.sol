@@ -12,10 +12,10 @@ contract DeployMerkleAirdrop is Script {
     uint256 public AMOUNT_TO_TRANSFER = 4 * (25 * 1e18);
 
     // Deploy the airdrop contract and bagel token contract
-    function deployMerkleAirdrop() public returns (MerkleAirdrop, BagelToken) {
+    function deployMerkleAirdrop() public returns (MerkleAirdrop airdrop, BagelToken bagelToken) {
         vm.startBroadcast();
-        BagelToken bagelToken = new BagelToken();
-        MerkleAirdrop airdrop = new MerkleAirdrop(ROOT, IERC20(bagelToken));
+         bagelToken = new BagelToken();
+         airdrop = new MerkleAirdrop(ROOT, IERC20(bagelToken));
         // Send Bagel tokens -> Merkle Air Drop contract
         bagelToken.mint(bagelToken.owner(), AMOUNT_TO_TRANSFER);
         IERC20(bagelToken).transfer(address(airdrop), AMOUNT_TO_TRANSFER);
