@@ -6,15 +6,7 @@ import { Script, console } from "forge-std/Script.sol";
 contract SplitSignature is Script {
     error __SplitSignatureScript__InvalidSignatureLength();
 
-    function splitSignature(bytes memory sig)
-        internal
-        pure
-        returns (
-            uint8 v,
-            bytes32 r,
-            bytes32 s
-        )
-    {
+    function splitSignature(bytes memory sig) internal pure returns (uint8 v, bytes32 r, bytes32 s) {
         if (sig.length != 65) {
             revert __SplitSignatureScript__InvalidSignatureLength();
         }

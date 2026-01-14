@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {Script} from "forge-std/Script.sol";
-import {stdJson} from "forge-std/StdJson.sol";
-import {console} from "forge-std/console.sol";
+import { Script } from "forge-std/Script.sol";
+import { stdJson } from "forge-std/StdJson.sol";
+import { console } from "forge-std/console.sol";
 
 // Merkle tree input file generator script
 contract GenerateInput is Script {
@@ -11,7 +11,7 @@ contract GenerateInput is Script {
     string[] types = new string[](2);
     uint256 count;
     string[] whitelist = new string[](4);
-    string private constant  INPUT_PATH = "/script/target/input.json";
+    string private constant INPUT_PATH = "/script/target/input.json";
 
     function run() public {
         types[0] = "address";
@@ -34,12 +34,40 @@ contract GenerateInput is Script {
         string memory json = string.concat('{ "types": ["address", "uint"], "count":', countString, ',"values": {');
         for (uint256 i = 0; i < whitelist.length; i++) {
             if (i == whitelist.length - 1) {
-                json = string.concat(json, '"', vm.toString(i), '"', ': { "0":', '"',whitelist[i],'"',', "1":', '"',amountString,'"', ' }');
+                json = string.concat(
+                    json,
+                    '"',
+                    vm.toString(i),
+                    '"',
+                    ': { "0":',
+                    '"',
+                    whitelist[i],
+                    '"',
+                    ', "1":',
+                    '"',
+                    amountString,
+                    '"',
+                    " }"
+                );
             } else {
-            json = string.concat(json, '"', vm.toString(i), '"', ': { "0":', '"',whitelist[i],'"',', "1":', '"',amountString,'"', ' },');
+                json = string.concat(
+                    json,
+                    '"',
+                    vm.toString(i),
+                    '"',
+                    ': { "0":',
+                    '"',
+                    whitelist[i],
+                    '"',
+                    ', "1":',
+                    '"',
+                    amountString,
+                    '"',
+                    " },"
+                );
             }
         }
-        json = string.concat(json, '} }');
+        json = string.concat(json, "} }");
 
         return json;
     }

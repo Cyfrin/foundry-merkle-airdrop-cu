@@ -4,9 +4,10 @@ pragma solidity ^0.8.24;
 import { MerkleProof } from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import { IERC20, SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
-import { SignatureChecker } from "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
+//import {SignatureChecker} from "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import { MessageHashUtils } from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
+
+//import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
 /**
  * @title Merkle Airdrop - Airdrop tokens to users who can prove they are in a merkle tree
@@ -22,9 +23,9 @@ contract MerkleAirdrop is EIP712 {
     error MerkleAirdrop__AlreadyClaimed();
     error MerkleAirdrop__InvalidSignature();
 
-    IERC20 private immutable i_airdropToken;
-    bytes32 private immutable i_merkleRoot;
-    mapping(address => bool) private s_hasClaimed;
+    IERC20 private immutable I_AIRDROP_TOKEN;
+    bytes32 private immutable I_MERKLE_ROOT;
+    mapping(address => bool) private sHasClaimed;
 
     bytes32 private constant MESSAGE_TYPEHASH = keccak256("AirdropClaim(address account,uint256 amount)");
 
@@ -41,8 +42,8 @@ contract MerkleAirdrop is EIP712 {
                                FUNCTIONS
     //////////////////////////////////////////////////////////////*/
     constructor(bytes32 merkleRoot, IERC20 airdropToken) EIP712("Merkle Airdrop", "1.0.0") {
-        i_merkleRoot = merkleRoot;
-        i_airdropToken = airdropToken;
+        I_MERKLE_ROOT = merkleRoot;
+        I_AIRDROP_TOKEN = airdropToken;
     }
 
     // claim the airdrop using a signature from the account owner
@@ -56,7 +57,7 @@ contract MerkleAirdrop is EIP712 {
     )
         external
     {
-        if (s_hasClaimed[account]) {
+        if (sHasClaimed[account]) {
             revert MerkleAirdrop__AlreadyClaimed();
         }
 
@@ -69,32 +70,33 @@ contract MerkleAirdrop is EIP712 {
         // calculate the leaf node hash
         bytes32 leaf = keccak256(bytes.concat(keccak256(abi.encode(account, amount))));
         // verify the merkle proof
-        if (!MerkleProof.verify(merkleProof, i_merkleRoot, leaf)) {
+        if (!MerkleProof.verify(merkleProof, I_MERKLE_ROOT, leaf)) {
             revert MerkleAirdrop__InvalidProof();
         }
 
-        s_hasClaimed[account] = true; // prevent users claiming more than once and draining the contract
+        sHasClaimed[account] = true; // prevent users claiming more than once and draining the contract
         emit Claimed(account, amount);
         // transfer the tokens
-        i_airdropToken.safeTransfer(account, amount);
+        I_AIRDROP_TOKEN.safeTransfer(account, amount);
     }
 
     // message we expect to have been signed
     function getMessageHash(address account, uint256 amount) public view returns (bytes32) {
-        return _hashTypedDataV4(
-            keccak256(abi.encode(MESSAGE_TYPEHASH, AirdropClaim({ account: account, amount: amount })))
-        );
+        return
+            _hashTypedDataV4(
+                keccak256(abi.encode(MESSAGE_TYPEHASH, AirdropClaim({ account: account, amount: amount })))
+            );
     }
 
     /*//////////////////////////////////////////////////////////////
                              VIEW AND PURE
     //////////////////////////////////////////////////////////////*/
     function getMerkleRoot() external view returns (bytes32) {
-        return i_merkleRoot;
+        return I_MERKLE_ROOT;
     }
 
     function getAirdropToken() external view returns (IERC20) {
-        return i_airdropToken;
+        return I_AIRDROP_TOKEN;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -114,12 +116,8 @@ contract MerkleAirdrop is EIP712 {
         returns (bool)
     {
         // could also use SignatureChecker.isValidSignatureNow(signer, digest, signature)
-        (
-            address actualSigner,
-            /*ECDSA.RecoverError recoverError*/
-            ,
-            /*bytes32 signatureLength*/
-        ) = ECDSA.tryRecover(digest, _v, _r, _s);
+        (address actualSigner,/*ECDSA.RecoverError recoverError*/ /*bytes32 signatureLength*/,) =
+            ECDSA.tryRecover(digest, _v, _r, _s);
         return (actualSigner == signer);
     }
 
