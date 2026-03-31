@@ -116,7 +116,7 @@ contract MakeMerkle is Script, ScriptHelper {
             string memory root = vm.toString(m.getRoot(leafs));
             // get the specific leaf working on
             string memory leaf = vm.toString(leafs[i]);
-            // get the singified input (address, amount)
+            // get the stringified input (address, amount)
             string memory input = inputs[i];
 
             // generate the Json output file (tree dump)
